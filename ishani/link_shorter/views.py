@@ -9,12 +9,18 @@ def main_page(request):
     return render(request,"index.html")
 def shorter(request):
     url = request.GET["url"] 
-    s = "".join(choices(charForShort,k=6))
-    if url[0:8] != "https://" and url[0:7] != "http://":
-        url = "http://" + url
-    su = ShortUrl(mainUrl=url,shortUrl=s)
+    while True:
+        s = "".join(choices(charForShort,k=6))
+        try:
+            ShortUrl.objects.get(shortUrl = s)
+        except:
+            if url[0:8] != "https://" and url[0:7] != "http://":
+                url = "http://" + url
+            su = ShortUrl(mainUrl=url,shortUrl=s)
+            su.save()
+            break
 
-    su.save()
+    
     return render(request,"short.html",{"url":str(request.get_host())+"/s/"+str(s)})
 def showShort(request,s):
     try:
